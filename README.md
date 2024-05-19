@@ -20,7 +20,7 @@ Follow these steps to set up the project locally.
 
 ```bash
 git clone https://github.com/samrathreddy/Unipay.git
-cd university-fee-payment
+cd Unipay
 ```
 
 #### 2. Install dependencies
@@ -31,7 +31,7 @@ npm install
 ```
 
 ```bash
-cd client
+cd server
 npm install
 ```
 
@@ -50,7 +50,7 @@ This will run the app in development mode. Open http://localhost:3000 to view it
 Navigate to the client directory and start the Express server with nodemon:
 
 ```bash
-cd client
+cd server
 npm run dev
 ```
 This will start the server on http://localhost:8080 and restart it automatically if there are any changes to the code.
