@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
-import { RollNumberInput, DobInput, SubmitButton } from './FormInput'
+import { RollNumberInput, DobInput, OptionInput, SubmitButton } from './FormInput'
 import { handleRollNumberResponse, handleDobResponse } from './responseHandlers';
 
 function RollNumberForm() {
   const [rollNumber, setRollNumber] = useState('');
   const [dob, setDob] = useState('');
+  const [option, setOption] = useState('');
   const [error, setError] = useState('');
   const [rollNumberSubmitted, setRollNumberSubmitted] = useState(false);
+  const [dobSubmitted, setDobSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+
 
   const handleRollNumberSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/v1/api/roll', {
+      const response = await fetch('http://localhost:8080/roll', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,8 +45,7 @@ function RollNumberForm() {
         },
         body: JSON.stringify({ rollNumber, dob }),
       });
-
-      handleDobResponse(response, setError);
+      handleDobResponse(response,setDobSubmitted , setError);
     } catch (error) {
       setError('Error logging DOB on the server.');
     } finally {
@@ -60,8 +62,13 @@ function RollNumberForm() {
         setDob={setDob}
       />
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      {rollNumberSubmitted && <DobInput dob={dob} setDob={setDob} />}
-      <SubmitButton loading={loading} rollNumberSubmitted={rollNumberSubmitted} />
+      {rollNumberSubmitted && (
+        <>
+          <DobInput dob={dob} setDob={setDob} />
+          {dobSubmitted && <OptionInput option={option} setOption={setOption} />}
+        </>
+      )}
+      <SubmitButton loading={loading} rollNumberSubmitted={rollNumberSubmitted} dobSubmitted={dobSubmitted} />
     </form>
   );
 }

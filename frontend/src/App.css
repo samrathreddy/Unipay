@@ -318,6 +318,29 @@ footer .footer-nav h5 {
   .input-field:hover {
     border-color: #666; /* Darker gray border on hover */
   }
+  .option-input {
+    padding-bottom: 20px;
+  }
+  
+  .option-input label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  
+  .option-input select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  
+  .option-input select:focus {
+    border-color: #666;
+  }
+  
   .submit-button {
     margin: 0 8px;
     background-color: #000000;; /* Darker blue on hover */

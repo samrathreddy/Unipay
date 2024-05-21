@@ -11,8 +11,9 @@ export const handleRollNumberResponse = async (response, setRollNumberSubmitted,
     }
   };
   
-  export const handleDobResponse = async (response, setError) => {
+  export const handleDobResponse = async (response, setDobSubmitted , setError) => {
     if (response.ok) {
+      setDobSubmitted(true);
       setError('');
     } else if (response.status === 429) {
       setError('Too many attempts, please try again after 15 minutes.');

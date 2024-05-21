@@ -39,10 +39,26 @@ export function DobInput({ dob, setDob }) {
     );
 }
 
-export function SubmitButton({ loading, rollNumberSubmitted }) {
+export function OptionInput ({ option, setOption }){
+  return (
+    <div className="option-input">
+      <select id="option" value={option} onChange={(e) => setOption(e.target.value)}>
+        <option value="" disabled>Choose your fee type</option>
+        <option value="reg">Regular Fee</option>
+        <option value="sup">Supplymentary Fee</option>
+        <option value="exam">Exam Fee</option>
+        <option value="reev">Re-evaluation fee</option>
+        <option value="tra">Transport</option>
+        <option value="fine">Fines</option>
+      </select>
+    </div>
+  );
+};
+
+export function SubmitButton({ loading, rollNumberSubmitted , dobSubmitted }) {
     return (
       <button className="submit-button" type="submit" disabled={loading}>
-        {loading ? 'Loading...' : (rollNumberSubmitted ? 'Submit DOB' : 'Submit Roll Number')}
+        {loading ? 'Loading...' : (rollNumberSubmitted ? (dobSubmitted ? "Pay" : "Submit Dob") : 'Submit Roll Number')}
       </button>
     );
 }

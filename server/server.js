@@ -28,7 +28,7 @@ app.use(['/v1/api/roll', '/v1/api/dob'], limiter);
 const validateInput = (input) => /^[a-zA-Z0-9]*$/.test(input); // Only allow alphanumeric characters
 
 // Endpoint to handle roll number validation
-app.post('/v1/api/roll', (req, res) => {
+app.post('/roll', (req, res) => {
   const { rollNumber } = req.body;
 
   // Validate roll number to prevent script injection
