@@ -5,8 +5,19 @@ const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 
 const app = express();
-const PORT = 8080;
+const PORT = 3000;
 
+const mongoose = require("mongoose");
+const MONGO_URL = 'mongodb+srv://srithikareddy09:srithikareddy09@cluster0.p4kmczo.mongodb.net/unipay';
+main()
+  .then(() => {
+    console.log("DB is runing");
+  })
+  .catch((err) => console.log(err));
+
+async function main() {
+  await mongoose.connect(MONGO_URL);
+}
 // Rate limiting middleware
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
