@@ -1,15 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
-import Header from './Componenets/Header'
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import RollNumberForm from './Componenets/RollNumberForm';
+import Home from './Componenets/index.tsx';
+import Header from './Componenets/Header';
 import Container from './Componenets/Container';
 import Footer from './Componenets/Footer';
-function App() {
+import './App.css';
+
+function AppContent() {
+  
+  const location = useLocation();
+  const isHomePage = location.pathname === '/home';
+
   return (
     <div className="App">
-      <Header/>
-      <Container/>
-      <Footer/>
+      {!isHomePage && <Header />}
+      <Routes>
+        <Route path="/" element={<RollNumberForm />} />
+        <Route path="/home" element={<Home />} />
+      </Routes>
+      <Container />
+      <Footer />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 

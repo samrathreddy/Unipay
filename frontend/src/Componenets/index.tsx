@@ -1,4 +1,15 @@
-import { MenuItem,Box, Button, Card, CardContent, CircularProgress, Grid, Step, StepLabel, Stepper } from '@mui/material';
+import {
+  MenuItem,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Grid,
+  Step,
+  StepLabel,
+  Stepper,
+} from '@mui/material';
 import { Field, Form, Formik, FormikConfig, FormikValues } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-material-ui';
 import React, { useState } from 'react';
@@ -14,12 +25,12 @@ export default function Home() {
           initialValues={{
             firstName: '',
             lastName: '',
-            PhoneNumber:'',
-            Email:'',
-            Agree: false,
-            yearSem : '',
+            PhoneNumber: '',
+            Email: '',
+            agree: false,
+            yearSem: '',
             money: 0,
-            branch:'',
+            branch: '',
             description: '',
           }}
           onSubmit={async (values) => {
@@ -41,40 +52,40 @@ export default function Home() {
               <Field fullWidth name="Email" component={TextField} label="Email" />
             </Box>
             <Box paddingBottom={2}>
-                <Field
-                  name="yearSem"
-                  component={TextField}
-                  label="Choose Year-Semester"
-                  select
-                  fullWidth
-                >
-                  <MenuItem value="I-I">I-I</MenuItem>
-                  <MenuItem value="I-II">I-II</MenuItem>
-                  <MenuItem value="II-I">II-I</MenuItem>
-                  <MenuItem value="II-II">II-II</MenuItem>
-                  <MenuItem value="III-I">III-I</MenuItem>
-                  <MenuItem value="III-II">III-II</MenuItem>
-                  <MenuItem value="IV-I">IV-I</MenuItem>
-                  <MenuItem value="IV-II">IV-II</MenuItem>
-                </Field>
-              </Box>
-              <Box paddingBottom={2}>
-                <Field
-                  name="branch"
-                  component={TextField}
-                  label="Choose Your Branch"
-                  select
-                  fullWidth
-                >
-                  <MenuItem value="CSE">CSE</MenuItem>
-                  <MenuItem value="ET">ET</MenuItem>
-                  <MenuItem value="EEE">EEE</MenuItem>
-                  <MenuItem value="ECE">ECE</MenuItem>
-                  <MenuItem value="MECH">MECH</MenuItem>
-                  <MenuItem value="CIVIL">CIVIL</MenuItem>
-                  <MenuItem value="EIE">EIE</MenuItem>
-                </Field>
-              </Box>
+              <Field
+                name="yearSem"
+                component={TextField}
+                label="Choose Year-Semester"
+                select
+                fullWidth
+              >
+                <MenuItem value="I-I">I-I</MenuItem>
+                <MenuItem value="I-II">I-II</MenuItem>
+                <MenuItem value="II-I">II-I</MenuItem>
+                <MenuItem value="II-II">II-II</MenuItem>
+                <MenuItem value="III-I">III-I</MenuItem>
+                <MenuItem value="III-II">III-II</MenuItem>
+                <MenuItem value="IV-I">IV-I</MenuItem>
+                <MenuItem value="IV-II">IV-II</MenuItem>
+              </Field>
+            </Box>
+            <Box paddingBottom={2}>
+              <Field
+                name="branch"
+                component={TextField}
+                label="Choose Your Branch"
+                select
+                fullWidth
+              >
+                <MenuItem value="CSE">CSE</MenuItem>
+                <MenuItem value="ET">ET</MenuItem>
+                <MenuItem value="EEE">EEE</MenuItem>
+                <MenuItem value="ECE">ECE</MenuItem>
+                <MenuItem value="MECH">MECH</MenuItem>
+                <MenuItem value="CIVIL">CIVIL</MenuItem>
+                <MenuItem value="EIE">EIE</MenuItem>
+              </Field>
+            </Box>
             <Box paddingBottom={2}>
               <Field
                 name="agree"
@@ -86,18 +97,7 @@ export default function Home() {
           </FormikStep>
           <FormikStep
             label="Bank Accounts"
-            validationSchema={object({
-              money: mixed().when('agree', {
-                is: true,
-                then: number()
-                  .required()
-                  .min(
-                    1_000_000,
-                    'Because you said you are a millionaire you need to have 1 million'
-                  ),
-                otherwise: number().required(),
-              }),
-            })}
+          
           >
             <Box paddingBottom={2}>
               <Field
@@ -177,8 +177,8 @@ export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>
 
           {currentChild}
 
-          <Grid container spacing={2}>
-            {step > 0 ? (
+          <Grid container spacing={2} justifyContent={step > 0 ? 'space-between' : 'flex-end'}>
+            {step > 0 && (
               <Grid item>
                 <Button
                   disabled={isSubmitting}
@@ -189,7 +189,7 @@ export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>
                   Back
                 </Button>
               </Grid>
-            ) : null}
+            )}
             <Grid item>
               <Button
                 startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}

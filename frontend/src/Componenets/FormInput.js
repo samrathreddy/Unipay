@@ -1,5 +1,5 @@
 import React ,{useState}from 'react';
-
+import { useNavigate } from 'react-router-dom';
 
 export function RollNumberInput({ rollNumber, setRollNumber, setRollNumberSubmitted, setDob }) {
   return (
@@ -55,12 +55,20 @@ export function OptionInput ({ option, setOption }){
     </div>
   );
 };
+export function SubmitButton({ loading, rollNumberSubmitted, dobSubmitted }) {
+  const navigate = useNavigate();
 
-export function SubmitButton({ loading, rollNumberSubmitted , dobSubmitted }) {
-    return (
-      <button className="submit-button" type="submit" disabled={loading}>
-        {loading ? 'Loading...' : (rollNumberSubmitted ? (dobSubmitted ? "Pay" : "Submit Dob") : 'Submit Roll Number')}
-      </button>
-    );
+  const handleClick = () => {
+    if (rollNumberSubmitted && dobSubmitted) {
+      navigate('/home');
+    }
+  };
+
+  return (
+    <button className="submit-button" type="submit" disabled={loading} onClick={handleClick}>
+      {loading ? 'Loading...' : (rollNumberSubmitted ? (dobSubmitted ? 'Pay' : 'Submit Dob') : 'Submit Roll Number')}
+    </button>
+  );
 }
+
 
