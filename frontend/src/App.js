@@ -1,10 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import RollNumberForm from './Componenets/RollNumberForm';
-import Home from './Componenets/index.tsx';
-import Header from './Componenets/Header';
-import Container from './Componenets/Container';
-import Footer from './Componenets/Footer';
+import { BrowserRouter as Router, Route, Routes, useLocation, Form } from 'react-router-dom';
+import Formfill from './Componenets/Formfill.tsx';
+import Home from './Componenets/Home';
 import './App.css';
 
 function AppContent() {
@@ -14,13 +11,10 @@ function AppContent() {
 
   return (
     <div className="App">
-      {!isHomePage && <Header />}
       <Routes>
-        <Route path="/" element={<RollNumberForm />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/form" element={<Formfill />} />
       </Routes>
-      <Container />
-      <Footer />
     </div>
   );
 }

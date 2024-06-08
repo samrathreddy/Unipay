@@ -1,13 +1,16 @@
 import React from 'react';
 import RollNumberForm from './RollNumberForm';
+import Container from './Container';
+import Footer from './Footer';
 
-function Header() {
+function Home() {
   const scrollToSteps = () => {
     const container = document.querySelector('.container');
     container.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
+    <div>
     <div className="top-container">
       <header>
         <img src="img/unipay-logo.png" alt="Unipay Logo" />
@@ -29,7 +32,10 @@ function Header() {
       </div>
       <img className="cloud" src="img/cloud.svg" width="35px" alt="Cloud" />
     </div>
+    <Container/>
+    <Footer/>
+    </div>
   );
 }
 
-export default Header;
+export default Home;
