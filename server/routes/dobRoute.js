@@ -20,15 +20,15 @@ router.post('/', async (req, res) => {
   }
 
   const log = `${new Date().toISOString()} - IP: ${req.ip}, Roll Number: ${rollNumber}, DOB: ${dob}\n`;
-  logEntry('dob-log.txt', log);
+  logEntry('../logs/dob-log.txt', log);
 
   try {
     const student = await validate.findOne({ Roll: rollNumber });
 
     if (student) {
       if (student.DOB === formatDate(dob)) {
-        const token = jwt.sign({ rollNumber, dob: formatDate(dob) }, SECRET_KEY, { algorithm: 'HS256', expiresIn: '5m' });
-        return res.status(200).json({ message: 'DOB matches', token });
+        // const token = jwt.sign({ rollNumber, dob: formatDate(dob) }, SECRET_KEY, { algorithm: 'HS256', expiresIn: '5m' });
+        return res.status(200).json({ message: 'DOB matches' });
       } else {
         return res.status(404).json({ message: 'DOB does not match', test: formatDate(dob) });
       }

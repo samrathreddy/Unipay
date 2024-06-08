@@ -7,17 +7,16 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   const { rollNumber } = req.body;
-  console.log("roll in")
   if (!validateInput(rollNumber)) {
     return res.status(400).json({ message: "Invalid roll number format." });
   }
 
   const log = `${new Date().toISOString()} - IP: ${req.ip}, Roll Number: ${rollNumber}\n`;
-  logEntry('roll-number-log.txt', log);
+  logEntry('../logs/roll-number-log.txt', log);
 
   try {
     try {
-      const students = await validate.find({}, 'Roll').limit(2); // Query for the first two documents and only retrieve the Roll field
+      const students = await validate.find({}, 'Roll').limit(2);
       console.log("First two roll numbers:");
       students.forEach(student => console.log(student.Roll));
     } catch (error) {

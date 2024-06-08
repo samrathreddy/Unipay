@@ -6,11 +6,13 @@ import { useNavigate } from 'react-router-dom';
 function RollNumberForm() {
   const [rollNumber, setRollNumber] = useState('');
   const [dob, setDob] = useState('');
-  const [option, setOption] = useState('');
+  const [feeType, setfeeType] = useState('');
   const [error, setError] = useState('');
   const [error1, setError1] = useState('');
   const [rollNumberSubmitted, setRollNumberSubmitted] = useState(false);
   const [dobSubmitted, setDobSubmitted] = useState(false);
+  const [year, setYear] = useState('');
+  const [semester, setSemester] = useState('');
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState('');
   const navigate = useNavigate();
@@ -69,11 +71,18 @@ function RollNumberForm() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ rollNumber, dob ,option}),
+        body: JSON.stringify({ rollNumber, dob , feeType , year, semester}),
       });
-      await handleFeeTypeResponse(response, setOption, setError);
+      const data = await response.json();
+      await handleFeeTypeResponse(response, setError);
       if (response.ok) {
-        navigate('/form');
+        localStorage.setItem('token', data.token);
+        setTimeout(() => {
+          // Remove token from localStorage after 5 minutes
+          localStorage.removeItem('token');
+        }, 5 * 60 * 1000);
+        console.log(data.token)
+        navigate('/form'); // Pass token in state
       }
     } catch (error) {
       setError('Error fetching fee type options.');
@@ -106,7 +115,14 @@ function RollNumberForm() {
         <>
           <DobInput dob={dob} setDob={setDob} />
           {error1 && <p style={{ color: 'red' }}>{error1}</p>}
-          {dobSubmitted && <OptionInput option={option} setOption={setOption} />}
+          {dobSubmitted && <OptionInput
+              feeType={feeType}
+              setfeeType={setfeeType}
+              year={year}
+              setYear={setYear}
+              semester={semester}
+              setSemester={setSemester}
+            />}
         </>
       )}
       <SubmitButton loading={loading} rollNumberSubmitted={rollNumberSubmitted} dobSubmitted={dobSubmitted} />

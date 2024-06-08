@@ -25,15 +25,14 @@ export const handleDobResponse = async (response, setDobSubmitted, setError1) =>
   }
 };
 
-export const handleFeeTypeResponse = async (response, setOption, setError) => {
+export const handleFeeTypeResponse = async (response, setError) => {
   if (response.ok) {
-    const responseData = await response.json();
-    setOption(responseData.options); // Assuming the response contains an array of options
+    console.log("ok")
     setError('');
   } else if (response.status === 429) {
     setError('Too many attempts, please try again after 15 minutes.');
   } else {
     const responseData = await response.json();
-    setError(responseData.message || 'Error fetching fee type options.');
+    setError(responseData.message || 'Err fetching fee type options.');
   }
 };

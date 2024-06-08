@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const limiter = require('./Middlewares/rateLimitMiddleware');
 const rollRoutes = require('./routes/rollRoute');
 const dobRoutes = require('./Routes/dobRoute');
+const feeRoutes = require('./Routes/feeRoute');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,6 +30,7 @@ connectDB();
 
 app.use('/v1/api/roll', rollRoutes);
 app.use('/v1/api/dob', dobRoutes);
+app.use('/v1/api/fee/', feeRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

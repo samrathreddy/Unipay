@@ -3,10 +3,10 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
+  console.log(authHeader)
 
   if (authHeader) {
-    const token = authHeader.split(' ')[1];
-
+    const token = authHeader;
     jwt.verify(token, SECRET_KEY, { algorithms: ['HS256'] }, (err, user) => {
       if (err) {
         return res.sendStatus(403);
