@@ -22,7 +22,7 @@ function RollNumberForm() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/v1/api/roll', {
+      const response = await fetch('v1/api/roll', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ function RollNumberForm() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/v1/api/dob', {
+      const response = await fetch('v1/api/dob', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ function RollNumberForm() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/v1/api/fee/check', {
+      const response = await fetch('/v1/api/fee/check', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
