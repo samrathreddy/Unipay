@@ -10,7 +10,19 @@ const feeRoutes = require('./Routes/feeRoute');
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// CORS configuration
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200
+};
 
+// Handle preflight requests
+app.options('*', cors(corsOptions)); // Preflight requests are always OPTIONS
+
+// Apply CORS and JSON body parser middleware
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(limiter);
 
