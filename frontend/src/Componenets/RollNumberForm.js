@@ -14,7 +14,6 @@ function RollNumberForm() {
   const [year, setYear] = useState('');
   const [semester, setSemester] = useState('');
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState('');
   const navigate = useNavigate();
 
   const handleRollNumberSubmit = async (event) => {
@@ -22,7 +21,7 @@ function RollNumberForm() {
     setLoading(true);
 
     try {
-      const response = await fetch('v1/api/roll', {
+      const response = await fetch('http://localhost:8000/v1/api/roll', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,7 +42,7 @@ function RollNumberForm() {
     setLoading(true);
 
     try {
-      const response = await fetch('v1/api/dob', {
+      const response = await fetch('http://localhost:8000/v1/api/dob', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,8 +51,8 @@ function RollNumberForm() {
       });
       const data = await response.json();
       handleDobResponse(response, setDobSubmitted, setError1);
-      if (response.ok) {
-        setToken(data.token); // Store the JWT token
+      if (data.ok) {
+        
       }
     } catch (error) {
       setError1('Error logging DOB on the server.');
@@ -66,7 +65,7 @@ function RollNumberForm() {
     setLoading(true);
 
     try {
-      const response = await fetch('/v1/api/fee/check', {
+      const response = await fetch('http://localhost:8000/v1/api/fee/check', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -81,7 +80,6 @@ function RollNumberForm() {
           // Remove token from localStorage after 5 minutes
           localStorage.removeItem('token');
         }, 5 * 60 * 1000);
-        console.log(data.token)
         navigate('/form'); // Pass token in state
       }
     } catch (error) {

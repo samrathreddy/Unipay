@@ -14,17 +14,8 @@ router.post('/', async (req, res) => {
   const log = `${new Date().toISOString()} - IP: ${req.ip}, Roll Number: ${rollNumber}\n`;
   logEntry('../logs/roll-number-log.txt', log);
 
-  try {
-    try {
-      const students = await validate.find({}, 'Roll').limit(2);
-      console.log("First two roll numbers:");
-      students.forEach(student => console.log(student.Roll));
-    } catch (error) {
-      console.error("Error fetching student rolls:", error);
-    }
-  
+  try {  
     const student = await validate.findOne({ Roll: rollNumber });
-
     if (student) {
       return res.status(200).json({ message: 'Success' });
     } else {

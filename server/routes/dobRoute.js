@@ -27,7 +27,6 @@ router.post('/', async (req, res) => {
 
     if (student) {
       if (student.DOB === formatDate(dob)) {
-        // const token = jwt.sign({ rollNumber, dob: formatDate(dob) }, SECRET_KEY, { algorithm: 'HS256', expiresIn: '5m' });
         return res.status(200).json({ message: 'DOB matches' });
       } else {
         return res.status(404).json({ message: 'DOB does not match', test: formatDate(dob) });

@@ -1,22 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  MenuItem,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Grid,
-  Step,
-  StepLabel,
-  Stepper,
-} from '@mui/material';
+import { MenuItem, Box, Button, Card, CardContent, CircularProgress, Grid, Step, StepLabel, Stepper, Snackbar } from '@mui/material';
 import { Field, Form, Formik, FormikConfig, FormikValues, ErrorMessage } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-material-ui';
 import * as Yup from 'yup';
 
-interface MyFormValues extends FormikValues {
+interface MyFormValues {
   fullName: string;
   PhoneNumber: string;
   Email: string;
@@ -36,9 +25,7 @@ const sleep = (time: number) => new Promise((acc) => setTimeout(acc, time));
 
 const validationSchema = Yup.object({
   fullName: Yup.string().required('Full Name is required'),
-  PhoneNumber: Yup.string()
-    .matches(/^[0-9]{10}$/, 'Phone number is not valid')
-    .required('Phone Number is required'),
+  PhoneNumber: Yup.string().matches(/^[0-9]{10}$/, 'Phone number is not valid').required('Phone Number is required'),
   Email: Yup.string().email('Invalid email address').required('Email is required'),
   agree: Yup.boolean().oneOf([true], 'You must accept the terms and conditions'),
   yearSem: Yup.string().required('Year-Semester is required'),
@@ -46,9 +33,17 @@ const validationSchema = Yup.object({
   description: Yup.string(),
 });
 
+interface FormikStepProps {
+  children: React.ReactNode;
+  label: string;
+  validationSchema?: Yup.ObjectSchema;
+}
+
 export default function Formfill() {
   const [initialValues, setInitialValues] = useState<MyFormValues | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedFeeType, setSelectedFeeType] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,43 +55,73 @@ export default function Formfill() {
       }
 
       try {
-        const response = await fetch('http://localhost:3000/v1/api/fee/verify', {
+        const response = await fetch('http://localhost:8000/v1/api/fee/verify', {
           method: 'POST',
-          headers: {
-            authorization: `${token}`,
-          },
+          headers: { authorization: `${token}` },
         });
 
         if (response.ok) {
           const data = await response.json();
+          const feeType = data.feeType || '';
+          const yearSemFee = feeType === 'CollegeFee' || feeType === 'TransportFee'
+            ? `${data.feeYear}`
+            : `${data.feeYear}-${data.CurrentSem}`;
+
           setInitialValues({
             fullName: data.Name || '',
             PhoneNumber: data.StudentMobileNo || '',
             Email: data.studentMailId || '',
             agree: false,
             yearSem: `${data.CurrentYear}-${data.CurrentSem}`,
-            amount: data.amount || 0,
+            amount: data.fee || 0,
             branch: data.Branch || '',
             description: '',
             Roll: data.Roll || '',
             DOB: data.DOB || '',
             Section: data.Section || '',
-            feeType: data.feeType || '',
-            yearSemFee: `${data.feeYear}-${data.feeSem}`,
+            feeType,
+            yearSemFee,
           });
+
+          setSelectedFeeType(feeType);
           setLoading(false);
         } else {
-          localStorage.removeItem('token'); // Clear invalid token
-          navigate('/'); // Redirect to home if token is not valid
+          localStorage.removeItem('token');
+          navigate('/');
         }
       } catch (error) {
         console.error('Error verifying token:', error);
-        navigate('/'); // Redirect to home on error
+        navigate('/');
       }
     };
 
     verifyToken();
   }, [navigate]);
+
+  const handleUpdate = async (values: MyFormValues) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/');
+      return;
+    }
+
+    try {
+      await fetch('http://localhost:8000/v1/api/fee/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: `${token}`,
+        },
+        body: JSON.stringify({ PhoneNumber: values.PhoneNumber, Email: values.Email, description: values.description }),
+      });
+    } catch (error) {
+      console.error('Error updating data:', error);
+    }
+  };
+
+  const handleSuccessClose = () => {
+    setSuccess(false);
+  };
 
   if (loading) {
     return <CircularProgress />;
@@ -124,44 +149,19 @@ export default function Formfill() {
           validationSchema={validationSchema}
           onSubmit={async (values) => {
             await sleep(3000);
-            console.log('values', values);
+            await handleUpdate(values);
+            setSuccess(true);
           }}
         >
-          <FormikStep label="Personal Data">
+          <FormikStep label="Personal Data" validationSchema={validationSchema}>
             <Box paddingBottom={2}>
-              <Field
-                fullWidth
-                name="fullName"
-                component={TextField}
-                label="Full Name"
-              />
+              <Field fullWidth name="fullName" component={TextField} label="Full Name" InputProps={{ readOnly: true }} />
             </Box>
             <Box paddingBottom={2}>
-              <Field
-                fullWidth
-                name="PhoneNumber"
-                component={TextField}
-                label="Phone Number"
-                type="tel"
-                inputProps={{
-                  maxLength: 10,
-                  pattern: "[0-9]{10}",
-                }}
-                required
-              />
+              <Field fullWidth name="PhoneNumber" component={TextField} label="Phone Number" type="tel" required />
             </Box>
             <Box paddingBottom={2}>
-              <Field
-                fullWidth
-                name="Email"
-                component={TextField}
-                label="Email"
-                type="email"
-                inputProps={{
-                  maxLength: 25,
-                }}
-                required
-              />
+              <Field fullWidth name="Email" component={TextField} label="Email" type="email" required />
             </Box>
             <Box paddingBottom={2}>
               <Field
@@ -170,6 +170,7 @@ export default function Formfill() {
                 label="Current Year-Semester"
                 select
                 fullWidth
+                InputProps={{ readOnly: true }}
               >
                 <MenuItem value="I-I">I-I</MenuItem>
                 <MenuItem value="I-II">I-II</MenuItem>
@@ -188,6 +189,7 @@ export default function Formfill() {
                 label="Branch"
                 select
                 fullWidth
+                InputProps={{ readOnly: true }}
               >
                 <MenuItem value="CSE">CSE</MenuItem>
                 <MenuItem value="ET">ET</MenuItem>
@@ -205,27 +207,17 @@ export default function Formfill() {
                 component={CheckboxWithLabel}
                 Label={{ label: 'I confirm that above details are true' }}
               />
-              <ErrorMessage name="agree" component="div" style={{ color: 'red' }} />
+              <div style={{ color: 'red' }}>
+                <ErrorMessage name="agree" />
+              </div>
             </Box>
           </FormikStep>
           <FormikStep label="Fee Details">
             <Box paddingBottom={2}>
-              <Field
-                fullWidth
-                name="Roll"
-                component={TextField}
-                label="Roll Number"
-                InputProps={{ readOnly: true }}
-              />
+              <Field fullWidth name="Roll" component={TextField} label="Roll Number" InputProps={{ readOnly: true }} />
             </Box>
             <Box paddingBottom={2}>
-              <Field
-                fullWidth
-                name="amount"
-                component={TextField}
-                label="Amount to be Paid"
-                InputProps={{ readOnly: true }}
-              />
+              <Field fullWidth name="amount" component={TextField} label="Amount to be Paid" InputProps={{ readOnly: true }} />
             </Box>
             <Box paddingBottom={2}>
               <Field
@@ -234,56 +226,68 @@ export default function Formfill() {
                 component={TextField}
                 label="Fee Category"
                 InputProps={{ readOnly: true }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedFeeType(e.target.value)}
               />
             </Box>
             <Box paddingBottom={2}>
-              <Field
-                name="yearSemFee"
-                component={TextField}
-                label="Fee Paying for Year-Semester"
-                select
-                fullWidth
-              >
-                <MenuItem value="I-I">I-I</MenuItem>
-                <MenuItem value="I-II">I-II</MenuItem>
-                <MenuItem value="II-I">II-I</MenuItem>
-                <MenuItem value="II-II">II-II</MenuItem>
-                <MenuItem value="III-I">III-I</MenuItem>
-                <MenuItem value="III-II">III-II</MenuItem>
-                <MenuItem value="IV-I">IV-I</MenuItem>
-                <MenuItem value="IV-II">IV-II</MenuItem>
-              </Field>
+              {selectedFeeType && (selectedFeeType === 'CollegeFee' || selectedFeeType === 'TransportFee') ? (
+                <Field
+                  name="yearSemFee"
+                  component={TextField}
+                  label="Fee Paying for Year"
+                  select
+                  fullWidth
+                  InputProps={{ readOnly: true }}
+                >
+                  <MenuItem value="I">I</MenuItem>
+                  <MenuItem value="II">II</MenuItem>
+                  <MenuItem value="III">III</MenuItem>
+                  <MenuItem value="IV">IV</MenuItem>
+                </Field>
+              ) : (
+                <Field
+                  name="yearSemFee"
+                  component={TextField}
+                  label="Fee Paying for Year-Semester"
+                  select
+                  fullWidth
+                  InputProps={{ readOnly: true }}
+                >
+                  <MenuItem value="I-I">I-I</MenuItem>
+                  <MenuItem value="I-II">I-II</MenuItem>
+                  <MenuItem value="II-I">II-I</MenuItem>
+                  <MenuItem value="II-II">II-II</MenuItem>
+                  <MenuItem value="III-I">III-I</MenuItem>
+                  <MenuItem value="III-II">III-II</MenuItem>
+                  <MenuItem value="IV-I">IV-I</MenuItem>
+                  <MenuItem value="IV-II">IV-II</MenuItem>
+                </Field>
+              )}
             </Box>
-          </FormikStep>
-          <FormikStep label="More Info">
             <Box paddingBottom={2}>
-              <Field
-                fullWidth
-                name="description"
-                component={TextField}
-                label="Description"
-              />
+              <Field fullWidth name="description" component={TextField} label="Description" multiline rows={4} />
             </Box>
           </FormikStep>
         </FormikStepper>
+        <Snackbar
+          open={success}
+          autoHideDuration={6000}
+          onClose={handleSuccessClose}
+          message="Form submitted successfully!"
+        />
       </CardContent>
     </Card>
   );
 }
 
-export interface FormikStepProps
-  extends Pick<FormikConfig<FormikValues>, 'children' | 'validationSchema'> {
-  label: string;
-}
-
-export function FormikStep({ children }: FormikStepProps) {
+function FormikStep({ children, validationSchema }: FormikStepProps) {
   return <>{children}</>;
 }
 
-export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>) {
+function FormikStepper({ children, ...props }: FormikConfig<FormikValues>) {
   const childrenArray = React.Children.toArray(children) as React.ReactElement<FormikStepProps>[];
   const [step, setStep] = useState(0);
-  const currentChild = childrenArray[step];
+  const currentChild = childrenArray[step] as React.ReactElement<FormikStepProps>;
   const [completed, setCompleted] = useState(false);
 
   function isLastStep() {
@@ -304,7 +308,7 @@ export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>
         }
       }}
     >
-      {({ isSubmitting, values }) => (
+      {({ isSubmitting }) => (
         <Form autoComplete="off">
           <Stepper alternativeLabel activeStep={step}>
             {childrenArray.map((child, index) => (
@@ -316,8 +320,8 @@ export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>
 
           {currentChild}
 
-          <Grid container spacing={2} justifyContent={step > 0 ? 'space-between' : 'flex-end'}>
-            {step > 0 && (
+          <Grid container spacing={2}>
+            {step > 0 ? (
               <Grid item>
                 <Button
                   disabled={isSubmitting}
@@ -328,11 +332,11 @@ export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>
                   Back
                 </Button>
               </Grid>
-            )}
+            ) : null}
             <Grid item>
               <Button
                 startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
-                disabled={isSubmitting || (step === 0 && !values.agree)} // Disable if not checked
+                disabled={isSubmitting}
                 variant="contained"
                 color="primary"
                 type="submit"

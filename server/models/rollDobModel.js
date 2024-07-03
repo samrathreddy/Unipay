@@ -16,4 +16,5 @@ const studentSchema = new mongoose.Schema({
 const validate = mongoose.model('2021students', studentSchema);
 
 
+
 module.exports = validate;
