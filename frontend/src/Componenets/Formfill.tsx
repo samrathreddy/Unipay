@@ -106,7 +106,7 @@ export default function Formfill() {
     }
 
     try {
-      await fetch('http://localhost:8000/v1/api/fee/update', {
+      const response = await fetch('http://localhost:8000/v1/api/fee/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,6 +114,53 @@ export default function Formfill() {
         },
         body: JSON.stringify({ PhoneNumber: values.PhoneNumber, Email: values.Email, description: values.description }),
       });
+  
+      if (response.ok) {
+        const keyResponse = await fetch('http://localhost:8000/v1/api/razor/getkey');
+        const { key } = await keyResponse.json();
+  
+        const orderResponse = await fetch('http://localhost:8000/v1/api/razor/payment/checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ amount: values.amount }),
+        });
+  
+        if (!orderResponse.ok) {
+          throw new Error(`Order creation failed: ${await orderResponse.text()}`);
+        }
+  
+        const { order } = await orderResponse.json();
+  
+        const options = {
+          key,
+          amount: order.amount,
+          currency: 'INR',
+          name: '6 Pack Programmer',
+          description: 'Tutorial of RazorPay',
+          image: 'https://avatars.githubusercontent.com/u/25058652?v=4',
+          order_id: order.id,
+          callback_url: 'http://localhost:8000/v1/api/razor/payment/paymentverification',
+          prefill: {
+            name: values.fullName,
+            email: values.Email,
+            contact: values.PhoneNumber,
+          },
+          notes: {
+            address: 'Razorpay Corporate Office',
+          },
+          theme: {
+            color: '#121212',
+          },
+        };
+  
+        const razor = new window.Razorpay(options);
+        razor.open();
+      } else {
+        const errorText = await response.text();
+        console.error(`Error updating data: ${errorText}`);
+      }
     } catch (error) {
       console.error('Error updating data:', error);
     }
@@ -122,6 +169,7 @@ export default function Formfill() {
   const handleSuccessClose = () => {
     setSuccess(false);
   };
+
 
   if (loading) {
     return <CircularProgress />;

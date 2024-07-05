@@ -126,6 +126,7 @@ router.post('/verify', authenticateJWT, async (req, res) => {
         studentMailId: student['student mail id'],
         fee: amount
       });
+      console.log("Verified")
     } else {
       // If student not found, return appropriate message
       res.status(404).json({ message: 'Student or fee details not found' });
@@ -137,7 +138,8 @@ router.post('/verify', authenticateJWT, async (req, res) => {
 });
 
 router.post('/update', authenticateJWT, async (req, res) =>{
-  res.status(200)
+  console.log("Done")
+  res.status(200).json("Ok Time for payment")
 });
 
 module.exports = router;

@@ -6,6 +6,7 @@ const limiter = require('./Middlewares/rateLimitMiddleware');
 const rollRoutes = require('./routes/rollRoute');
 const dobRoutes = require('./Routes/dobRoute');
 const feeRoutes = require('./Routes/feeRoute');
+const paymentRoutes = require('./Routes/paymentRoute');
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -31,6 +32,10 @@ connectDB();
 app.use('/v1/api/roll', rollRoutes);
 app.use('/v1/api/dob', dobRoutes);
 app.use('/v1/api/fee', feeRoutes);
+app.use('/v1/api/razor/payment', paymentRoutes);
+app.use("/v1/api/razor/getkey", (req, res) =>
+  res.status(200).json({ key: process.env.RAZORPAY_API_KEY })
+);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
