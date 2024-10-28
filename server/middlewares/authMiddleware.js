@@ -3,7 +3,6 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  console.log("Authorized :",authHeader)
 
   if (authHeader) {
     const token = authHeader;
@@ -11,7 +10,6 @@ const authenticateJWT = (req, res, next) => {
       if (err) {
         return res.sendStatus(403);
       }
-
       req.user = user;
       next();
     });

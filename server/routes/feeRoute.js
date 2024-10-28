@@ -102,8 +102,8 @@ router.post('/verify', authenticateJWT, async (req, res) => {
     // Assuming req.user contains the user data from the token
     const { Roll, dob, feeType, feeYear, feeSem } = req.user;
 
-    // Query the database using Roll and dob
     const student = await students.findOne({ Roll, DOB: dob });
+    // Query the database using Roll and dob
     const feeDetails = await FeeDetail.findOne({ Roll, DOB: dob });
 
     if (student && feeDetails) {
@@ -137,9 +137,25 @@ router.post('/verify', authenticateJWT, async (req, res) => {
   }
 });
 
-router.post('/update', authenticateJWT, async (req, res) =>{
-  console.log("Done")
-  res.status(200).json("Ok Time for payment")
+router.post('/update', authenticateJWT, async (req, res) => {
+  const { Roll, dob } = req.user;
+  
+  try {
+    const student = await students.findOne({ Roll, DOB: dob });
+    console.log("In updation")
+    console.log(student['student mail id'])
+    const email = student['student mail id'];
+    if (student && (!email || email === "NaN")) {
+        console.log("In updation: updating email");
+        student['student mail id'] = req.body.Email;
+        console.log(req.body.Email);
+        await student.save();
+    }
+    res.status(200).json("Ok Time for payment");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("An error occurred while updating the student.");
+  }
 });
 
 module.exports = router;

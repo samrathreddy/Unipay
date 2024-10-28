@@ -28,9 +28,12 @@ export const handleDobResponse = async (response, setDobSubmitted, setError1) =>
 export const handleFeeTypeResponse = async (response, setError) => {
   if (response.ok) {
     console.log("ok")
-    setError('');
   } else if (response.status === 429) {
     setError('Too many attempts, please try again after 15 minutes.');
+  }  else if (response.status === 403) {
+    setError('Fee option not enabled yet.');
+  }else if (response.status === 409) {
+    setError('Already paid');
   } else {
     const responseData = await response.json();
     setError(responseData.message || 'Err fetching fee type options.');

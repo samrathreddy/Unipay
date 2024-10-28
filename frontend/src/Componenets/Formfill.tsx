@@ -98,73 +98,120 @@ export default function Formfill() {
     verifyToken();
   }, [navigate]);
 
-  const handleUpdate = async (values: MyFormValues) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/');
-      return;
+const handleUpdate = async (values) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    navigate('/');
+    return;
+  }
+
+  try {
+    // Step 1: Update fee details
+    const updateResponse = await fetch('http://localhost:8000/v1/api/fee/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `${token}`,
+      },
+      body: JSON.stringify({
+        PhoneNumber: values.PhoneNumber,
+        Email: values.Email,
+        description: values.description,
+      }),
+    });
+
+    if (!updateResponse.ok) {
+      throw new Error(`Failed to update fee details: ${await updateResponse.text()}`);
     }
 
-    try {
-      const response = await fetch('http://localhost:8000/v1/api/fee/update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          authorization: `${token}`,
-        },
-        body: JSON.stringify({ PhoneNumber: values.PhoneNumber, Email: values.Email, description: values.description }),
-      });
-  
-      if (response.ok) {
-        const keyResponse = await fetch('http://localhost:8000/v1/api/razor/getkey');
-        const { key } = await keyResponse.json();
-  
-        const orderResponse = await fetch('http://localhost:8000/v1/api/razor/payment/checkout', {
+    // Step 2: Get Razorpay key
+    const keyResponse = await fetch('http://localhost:8000/v1/api/razor/getkey', {
+      method: 'POST',
+      headers: {
+        authorization: `${token}`,
+      },
+    });
+
+    if (!keyResponse.ok) {
+      throw new Error(`Failed to fetch Razorpay key: ${await keyResponse.text()}`);
+    }
+
+    const { key } = await keyResponse.json();
+
+    // Step 3: Create Razorpay order
+    const orderResponse = await fetch('http://localhost:8000/v1/api/razor/payment/checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `${token}`,
+      },
+      body: JSON.stringify({ amount: values.amount }),
+    });
+
+    if (!orderResponse.ok) {
+      throw new Error(`Order creation failed: ${await orderResponse.text()}`);
+    }
+
+    const { order } = await orderResponse.json();
+
+    // Step 4: Configure and open Razorpay payment modal
+    const options = {
+      key,
+      amount: order.amount,
+      currency: 'INR',
+      name: 'CVR College Of engineering',
+      description: 'Fee Payments',
+      image: 'https://upload.wikimedia.org/wikipedia/en/4/4c/Cvrh.ibp.jpg',
+      order_id: order.id,
+      callback_url: `http://localhost:8000/v1/api/razor/payment/paymentverification`,
+      prefill: {
+        name: values.fullName,
+        email: values.Email,
+        contact: values.PhoneNumber,
+      },
+      notes: {
+        address: 'Razorpay Corporate Office',
+      },
+      theme: {
+        color: '#121212',
+      },
+
+    // Add handler function to verify payment after success
+    handler: async function (response) {
+      try {
+        const verificationResponse = await fetch('http://localhost:8000/v1/api/razor/payment/paymentverification', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            authorization: `${token}`,
           },
-          body: JSON.stringify({ amount: values.amount }),
+          body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+          }),
         });
-  
-        if (!orderResponse.ok) {
-          throw new Error(`Order creation failed: ${await orderResponse.text()}`);
+
+        if (!verificationResponse.ok) {
+          throw new Error(`Payment verification failed: ${await verificationResponse.text()}`);
         }
-  
-        const { order } = await orderResponse.json();
-  
-        const options = {
-          key,
-          amount: order.amount,
-          currency: 'INR',
-          name: '6 Pack Programmer',
-          description: 'Tutorial of RazorPay',
-          image: 'https://avatars.githubusercontent.com/u/25058652?v=4',
-          order_id: order.id,
-          callback_url: 'http://localhost:8000/v1/api/razor/payment/paymentverification',
-          prefill: {
-            name: values.fullName,
-            email: values.Email,
-            contact: values.PhoneNumber,
-          },
-          notes: {
-            address: 'Razorpay Corporate Office',
-          },
-          theme: {
-            color: '#121212',
-          },
-        };
-  
-        const razor = new window.Razorpay(options);
-        razor.open();
-      } else {
-        const errorText = await response.text();
-        console.error(`Error updating data: ${errorText}`);
+
+        const result = await verificationResponse.json();
+        console.log('Payment verification successful:', result);
+        // Handle successful verification (e.g., show success message or navigate)
+      } catch (verificationError) {
+        console.error('Error during payment verification:', verificationError);
+        // Handle verification error (e.g., show error message)
       }
-    } catch (error) {
-      console.error('Error updating data:', error);
-    }
+    },
   };
+
+  const razor = new window.Razorpay(options);
+  razor.open();
+}catch (error) {
+    console.error('Error updating data:', error);
+  }
+};
 
   const handleSuccessClose = () => {
     setSuccess(false);
@@ -206,7 +253,7 @@ export default function Formfill() {
               <Field fullWidth name="fullName" component={TextField} label="Full Name" InputProps={{ readOnly: true }} />
             </Box>
             <Box paddingBottom={2}>
-              <Field fullWidth name="PhoneNumber" component={TextField} label="Phone Number" type="tel" required />
+              <Field fullWidth name="PhoneNumber" component={TextField} label="Phone Number" type="tel" InputProps={{ readOnly: true }} />
             </Box>
             <Box paddingBottom={2}>
               <Field fullWidth name="Email" component={TextField} label="Email" type="email" required />

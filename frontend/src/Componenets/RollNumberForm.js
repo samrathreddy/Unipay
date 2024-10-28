@@ -26,7 +26,7 @@ function RollNumberForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ rollNumber }),
+        body: JSON.stringify({ rollNumber: rollNumber.toUpperCase() }),
       });
 
       handleRollNumberResponse(response, setRollNumberSubmitted, setError);
@@ -47,7 +47,7 @@ function RollNumberForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ rollNumber, dob }),
+        body: JSON.stringify({ rollNumber: rollNumber.toUpperCase(), dob }),
       });
       const data = await response.json();
       handleDobResponse(response, setDobSubmitted, setError1);
@@ -70,7 +70,7 @@ function RollNumberForm() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ rollNumber, dob , feeType , year, semester}),
+        body: JSON.stringify({ rollNumber: rollNumber.toUpperCase(), dob , feeType , year, semester}),
       });
       const data = await response.json();
       await handleFeeTypeResponse(response, setError);
@@ -108,7 +108,6 @@ function RollNumberForm() {
         setRollNumberSubmitted={setRollNumberSubmitted}
         setDob={setDob}
       />
-      {error && <p style={{ color: 'red' }}>{error}</p>}
       {rollNumberSubmitted && (
         <>
           <DobInput dob={dob} setDob={setDob} />
@@ -123,6 +122,16 @@ function RollNumberForm() {
             />}
         </>
       )}
+      {error && (
+  <p
+    style={{
+      color: 'red',
+      fontSize: '20px', // Increase font size
+    }}
+  >
+    {error}
+  </p>
+)}
       <SubmitButton loading={loading} rollNumberSubmitted={rollNumberSubmitted} dobSubmitted={dobSubmitted} />
     </form>
   );
