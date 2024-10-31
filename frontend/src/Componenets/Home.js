@@ -13,7 +13,7 @@ function Home() {
     <div>
     <div className="top-container">
       <header>
-        <img src="img/unipay-logo.png" alt="Unipay Logo" />
+        <img src="trans.png" alt="" />
         <div className="center-nav">
           <a onClick={scrollToSteps} href="#">Steps</a>
           <a href="#">Why us?</a>

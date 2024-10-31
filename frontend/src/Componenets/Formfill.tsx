@@ -36,7 +36,7 @@ const validationSchema = Yup.object({
 interface FormikStepProps {
   children: React.ReactNode;
   label: string;
-  validationSchema?: Yup.ObjectSchema;
+  validationSchema?: Yup.ObjectSchema<any>;
 }
 
 export default function Formfill() {
@@ -65,7 +65,7 @@ export default function Formfill() {
           const feeType = data.feeType || '';
           const yearSemFee = feeType === 'CollegeFee' || feeType === 'TransportFee'
             ? `${data.feeYear}`
-            : `${data.feeYear}-${data.CurrentSem}`;
+            : `${data.feeYear}-${data.feeSem}`;
 
           setInitialValues({
             fullName: data.Name || '',

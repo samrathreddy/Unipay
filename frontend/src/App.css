@@ -385,6 +385,7 @@ footer .footer-nav h5 {
         width: -webkit-fill-available;
     }
     header>.center-nav {
+        
         display: none;
     }
     header .hamburger {

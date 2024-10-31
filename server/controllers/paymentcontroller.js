@@ -7,6 +7,9 @@ const { feeAmount, isFeeEnabled, isFeePaid } = require('../utils/feeUtil');
 const students = require('../models/rollDobModel');
 const sendSuccessEmail = require('./mailer');
 const { sendPaymentForVerification } = require('./discordBot');
+const xlsx = require('xlsx');
+const fs = require('fs');
+const { Console } = require('console');
 
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_API_KEY,
@@ -177,6 +180,74 @@ const paymentVerification = async (req, res) => {
         date: currentDate,
         time: currentTime 
       };
+      //Excel Updationg
+      console.log(currentDate)
+      try {
+        const filePath = 'main.xlsx'; // Adjust the path to your Excel file
+        let workbook;
+        
+        if (fs.existsSync(filePath)) {
+            // If the file exists, read it
+            workbook = xlsx.readFile(filePath);
+        } else {
+            // If the file does not exist, create a new workbook and a new worksheet
+            workbook = xlsx.utils.book_new();
+            const worksheet = xlsx.utils.aoa_to_sheet([[
+                'Date', 'Time', 'TransactionId', 'Razorpay_Order_Id', 'Batch', 
+                'Roll', 'Name', 'Branch', 'Section', 'Phone', 'Email', 
+                'FeeType', 'FeeYear', 'FeeSem', 'Amount', 'Method', 'Status'
+            ]]);
+            xlsx.utils.book_append_sheet(workbook, worksheet, 'Payments');
+        }
+    
+        const sheetName = 'Payments';
+        const worksheet = workbook.Sheets[sheetName];
+    
+        // Prepare new row data
+        const newRow = {
+            Date: currentDate,
+            Time: currentTime,
+            transactionId,
+            razorpay_order_id,
+            Batch: Roll.substring(0, 2),
+            Roll: student.Roll,
+            Name: student.Name,
+            Branch: student.Branch,
+            Section: student.Section,
+            phone: payment.contact,
+            email: student['student mail id'],
+            FeeType: feeType,
+            FeeYear: feeYear,
+            FeeSem: feeSem,
+            Amount: payment.amount / 100,
+            method: payment.method,
+            manual: "Verification in progress...",
+            Status: payment.status
+        };
+        console.log("Adding into excel")
+    
+        // Get the range of existing data or initialize if empty
+        const range = worksheet['!ref'] ? xlsx.utils.decode_range(worksheet['!ref']) : { s: { r: 0, c: 0 }, e: { r: 0, c: 0 } };
+        console.log(range)
+        const newRowIndex = range.e.r + 1; // Add new row after the last one
+    
+        // Populate the new row in the worksheet
+        for (const [key, value] of Object.entries(newRow)) {
+            const colIndex = Object.keys(newRow).indexOf(key); // Get column index
+            const cellAddress = xlsx.utils.encode_cell({ c: colIndex, r: newRowIndex });
+            worksheet[cellAddress] = { v: value, t: typeof value === 'number' ? 'n' : 's' };
+        }
+    
+        // Update the worksheet's range
+        worksheet['!ref'] = xlsx.utils.encode_range(range.s, { r: newRowIndex, c: range.e.c });
+    
+        // Save the updated workbook
+        xlsx.writeFile(workbook, filePath);
+        
+    } catch (error) {
+        console.error("Error updating Excel file", error);
+    }
+
       // Mailing
       try{
         sendSuccessEmail(student['student mail id'], paymentDetails)

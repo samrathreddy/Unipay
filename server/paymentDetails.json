@@ -1,6 +1,6 @@
 {
-  "1300557910631256064": {
-    "transactionId": "291024020248",
+  "1301476144159264829": {
+    "transactionId": "311024145132",
     "roll": "21B81A05V9",
     "name": "SAMRATH REDDY YELAPATI",
     "Branch": "CSE",
@@ -8,11 +8,11 @@
     "feeYear": "I",
     "feeSem": "",
     "amount": 120000,
-    "date": "29/10/2024",
-    "time": "2:02:48 am"
+    "date": "31/10/2024",
+    "time": "2:51:32 pm"
   },
-  "1300558826977755263": {
-    "transactionId": "291024020627",
+  "1301477046916222988": {
+    "transactionId": "311024145507",
     "roll": "21B81A05V9",
     "name": "SAMRATH REDDY YELAPATI",
     "Branch": "CSE",
@@ -20,11 +20,11 @@
     "feeYear": "I",
     "feeSem": "",
     "amount": 120000,
-    "date": "29/10/2024",
-    "time": "2:06:27 am"
+    "date": "31/10/2024",
+    "time": "2:55:07 pm"
   },
-  "1300565450165321819": {
-    "transactionId": "291024023246",
+  "1301482524882636840": {
+    "transactionId": "311024151653",
     "roll": "21B81A05V9",
     "name": "SAMRATH REDDY YELAPATI",
     "Branch": "CSE",
@@ -32,7 +32,115 @@
     "feeYear": "I",
     "feeSem": "",
     "amount": 120000,
-    "date": "29/10/2024",
-    "time": "2:32:46 am"
+    "date": "31/10/2024",
+    "time": "3:16:53 pm"
+  },
+  "1301484052276187167": {
+    "transactionId": "311024152257",
+    "roll": "21B81A05V9",
+    "name": "SAMRATH REDDY YELAPATI",
+    "Branch": "CSE",
+    "feeType": "CollegeFee",
+    "feeYear": "I",
+    "feeSem": "",
+    "amount": 120000,
+    "date": "31/10/2024",
+    "time": "3:22:57 pm"
+  },
+  "1301495593906208768": {
+    "transactionId": "311024160849",
+    "roll": "21B81A05V9",
+    "name": "SAMRATH REDDY YELAPATI",
+    "Branch": "CSE",
+    "feeType": "CollegeFee",
+    "feeYear": "I",
+    "feeSem": "",
+    "amount": 120000,
+    "date": "31/10/2024",
+    "time": "4:08:49 pm"
+  },
+  "1301496292765077534": {
+    "transactionId": "311024161136",
+    "roll": "21B81A05V9",
+    "name": "SAMRATH REDDY YELAPATI",
+    "Branch": "CSE",
+    "feeType": "CollegeFee",
+    "feeYear": "I",
+    "feeSem": "",
+    "amount": 120000,
+    "date": "31/10/2024",
+    "time": "4:11:36 pm"
+  },
+  "1301497266963611741": {
+    "transactionId": "311024161528",
+    "roll": "21B81A05V9",
+    "name": "SAMRATH REDDY YELAPATI",
+    "Branch": "CSE",
+    "feeType": "CollegeFee",
+    "feeYear": "I",
+    "feeSem": "",
+    "amount": 120000,
+    "date": "31/10/2024",
+    "time": "4:15:28 pm"
+  },
+  "1301497678731149363": {
+    "transactionId": "311024161706",
+    "roll": "21B81A05V9",
+    "name": "SAMRATH REDDY YELAPATI",
+    "Branch": "CSE",
+    "feeType": "CollegeFee",
+    "feeYear": "I",
+    "feeSem": "",
+    "amount": 120000,
+    "date": "31/10/2024",
+    "time": "4:17:06 pm"
+  },
+  "1301497900546789418": {
+    "transactionId": "311024161759",
+    "roll": "21B81A05V9",
+    "name": "SAMRATH REDDY YELAPATI",
+    "Branch": "CSE",
+    "feeType": "CollegeFee",
+    "feeYear": "I",
+    "feeSem": "",
+    "amount": 120000,
+    "date": "31/10/2024",
+    "time": "4:17:59 pm"
+  },
+  "1301498780029292656": {
+    "transactionId": "311024162129",
+    "roll": "21B81A05V9",
+    "name": "SAMRATH REDDY YELAPATI",
+    "Branch": "CSE",
+    "feeType": "CollegeFee",
+    "feeYear": "I",
+    "feeSem": "",
+    "amount": 120000,
+    "date": "31/10/2024",
+    "time": "4:21:29 pm"
+  },
+  "1301499029317881887": {
+    "transactionId": "311024162228",
+    "roll": "21B81A05V9",
+    "name": "SAMRATH REDDY YELAPATI",
+    "Branch": "CSE",
+    "feeType": "CollegeFee",
+    "feeYear": "I",
+    "feeSem": "",
+    "amount": 120000,
+    "date": "31/10/2024",
+    "time": "4:22:28 pm"
+  },
+  "1301499583943282740": {
+    "transactionId": "311024162440",
+    "roll": "21B81A05V9",
+    "name": "SAMRATH REDDY YELAPATI",
+    "Branch": "CSE",
+    "feeType": "RegularFee",
+    "feeYear": "IV",
+    "feeSem": "II",
+    "amount": 2000,
+    "date": "31/10/2024",
+    "time": "4:24:40 pm"
   }
 }

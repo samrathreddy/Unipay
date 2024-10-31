@@ -5,7 +5,7 @@ export default function Footer() {
     <footer>
         <div className="footer-nav">
             <div className="socials">
-                <h4>Your place to talk</h4>
+                <h4>Your place to pay</h4>
                 <img src="img/Flag-logo.png" alt="" />
                 {/* English, USA */}
                 <select id="country">
