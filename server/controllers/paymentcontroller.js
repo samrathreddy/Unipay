@@ -10,6 +10,8 @@ const { sendPaymentForVerification } = require('./discordBot');
 const xlsx = require('xlsx');
 const fs = require('fs');
 const { Console } = require('console');
+const mongoose = require('mongoose');
+
 
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_API_KEY,
@@ -33,7 +35,7 @@ const checkout = async (req, res) => {
   try {
     const token = req.headers.authorization;
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    const { Roll, dob, feeType, feeYear, feeSem } = decoded;
+    let { Roll, dob, feeType, feeYear, feeSem } = decoded;
 
     const feeDetails = await FeeDetail.findOne({ Roll, DOB: dob });
 
@@ -69,7 +71,7 @@ const paymentVerification = async (req, res) => {
       const payment = await instance.payments.fetch(razorpay_payment_id);
       const token = req.headers.authorization;
       const decoded = jwt.verify(token, process.env.SECRET_KEY);
-      const { Roll, dob, feeType, feeYear, feeSem } = decoded;
+      let { Roll, dob, feeType, feeYear, feeSem } = decoded;
       const student = await students.findOne({ Roll, DOB: dob });
 
       console.log("in PaymentController");
@@ -77,83 +79,94 @@ const paymentVerification = async (req, res) => {
       console.log(`Transaction ID: ${transactionId}`);
       const currentDate = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
       const currentTime = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' });
-      try{
-        // Check if the student already has a payment record
-        let paymentRecord = await Payment.findOne({ Roll });
-        if (!paymentRecord) {
-          // If no payment record exists, create a new one with Payments as an array
-          paymentRecord = new Payment({
-            Roll,
-            Batch: Roll.substring(0, 2),
-            Name: student.Name,
-            DOB: student.DOB,
-            Branch: student.Branch,
-            Section: student.Section,
-            phone: payment.contact,
-            email: student['student mail id'],
-            Payments: [
-              {
-                transactionId,
-                razorpay_order_id,
-                razorpay_payment_id,
-                razorpay_signature,
-                feeType,
-                feeYear,
-                feeSem,
-                amount: payment.amount / 100,
-                status: payment.status,
-                created_at_date: currentDate,
-                created_at_time: new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }),
-                method: payment.method,
-                card_id: payment.card_id,
-                bank: payment.bank,
-                wallet: payment.wallet,
-                vpa: payment.vpa,
-                description: payment.description,
-              },
-            ],
-          });
-        } else {
-          // If payment record exists, check if today's transaction ID already exists in Payments array
-          const existingPayment = paymentRecord.Payments.find(p => p.transactionId === transactionId);
-          
-          if (!existingPayment) {
-            // Add new payment record for today
-            console.log("Adding new payment record for transaction ID:", transactionId);
-            paymentRecord.Payments.push({
-              transactionId,
-              razorpay_order_id,
-              razorpay_payment_id,
-              razorpay_signature,
-              feeType,
-              feeYear,
-              feeSem,
-              amount: payment.amount / 100,
-              status: payment.status,
-              created_at_date: currentDate,
-              created_at_time: new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }),
-              method: payment.method,
-              card_id: payment.card_id,
-              bank: payment.bank,
-              wallet: payment.wallet,
-              vpa: payment.vpa,
-              description: payment.description,
-            });
-          } else {
-            // Optionally handle cases where the transaction ID already exists
-            console.log("Payment record already exists for transaction ID:", transactionId);
-          }
-        }
+      const paymentCollection = mongoose.connection.collection('payments'); // Use the correct collection name
 
-        // Save the payment record after modification
-        await paymentRecord.save();
-      }catch (error) {
+    try {
+        // Check if the student already has a payment record
+        console.log(Roll);
+        let paymentRecord = await paymentCollection.findOne({ Roll });
+
+        if (!paymentRecord) {
+            // If no payment record exists, create a new one
+            const newPaymentRecord = {
+                Roll,
+                Batch: Roll.substring(0, 2),
+                Name: student.Name,
+                DOB: student.DOB,
+                Branch: student.Branch,
+                Section: student.Section,
+                phone: payment.contact,
+                email: student['student mail id'],
+                Payments: [
+                    {
+                        transactionId,
+                        razorpay_order_id,
+                        razorpay_payment_id,
+                        razorpay_signature,
+                        feeType,
+                        feeYear,
+                        feeSem,
+                        amount: payment.amount / 100,
+                        status: payment.status,
+                        created_at_date: currentDate,
+                        created_at_time: currentTime,
+                        method: payment.method,
+                        card_id: payment.card_id,
+                        bank: payment.bank,
+                        wallet: payment.wallet,
+                        vpa: payment.vpa,
+                        description: payment.description,
+                    },
+                ],
+            };
+
+            // Use insertOne to insert the new payment record
+            console.log(newPaymentRecord)
+            await paymentCollection.insertOne(newPaymentRecord);
+        } else {
+            // If payment record exists, check if today's transaction ID already exists in Payments array
+            const existingPayment = paymentRecord.Payments.find(p => p.transactionId === transactionId);
+            
+            if (!existingPayment) {
+                // Add new payment record for today
+                console.log("Adding new payment record for transaction ID:", transactionId);
+                paymentRecord.Payments.push({
+                    transactionId,
+                    razorpay_order_id,
+                    razorpay_payment_id,
+                    razorpay_signature,
+                    feeType,
+                    feeYear,
+                    feeSem,
+                    amount: payment.amount / 100,
+                    status: payment.status,
+                    created_at_date: currentDate,
+                    created_at_time: currentTime,
+                    method: payment.method,
+                    card_id: payment.card_id,
+                    bank: payment.bank,
+                    wallet: payment.wallet,
+                    vpa: payment.vpa,
+                    description: payment.description,
+                });
+
+                // Update the existing record
+                await paymentCollection.updateOne(
+                    { Roll },
+                    { $set: { Payments: paymentRecord.Payments } }
+                );
+            } else {
+                console.log("Payment record already exists for transaction ID:", transactionId);
+            }
+        }
+    } catch (error) {
         console.error("Error in updating Payment DB", error);
         res.status(500).json({ success: false, message: "Error updating payment details into payment DB" });
-      }
+    }
+    
 
       try{
-        const feeDetails = await FeeDetail.findOne({ Roll, DOB: dob });
+        let feeDetails = await FeeDetail.findOne({ Roll, DOB: dob });
         if (feeDetails) {
           const checkEnabled = isFeeEnabled(feeDetails, feeType, feeYear, feeSem);
           if (checkEnabled) {
