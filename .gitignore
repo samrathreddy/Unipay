@@ -10,7 +10,6 @@
 .env
 # testing
 /coverage
-/server/logs/
 
 # production
 /build
@@ -27,5 +26,4 @@ yarn-debug.log*
 yarn-error.log*
 
 server/main.xlsx
-server/logs/
 server/paymentDetails.json

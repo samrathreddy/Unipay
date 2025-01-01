@@ -14,6 +14,8 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+app.set('trust proxy', true);
+
 app.use(express.static(path.resolve(__dirname,'build')))
 
 // CORS configuration
