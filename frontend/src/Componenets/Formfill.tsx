@@ -55,7 +55,7 @@ export default function Formfill() {
       }
 
       try {
-        const response = await fetch('http://localhost:8000/v1/api/fee/verify', {
+        const response = await fetch('/v1/api/fee/verify', {
           method: 'POST',
           headers: { authorization: `${token}` },
         });
@@ -107,7 +107,7 @@ const handleUpdate = async (values) => {
 
   try {
     // Step 1: Update fee details
-    const updateResponse = await fetch('http://localhost:8000/v1/api/fee/update', {
+    const updateResponse = await fetch('/v1/api/fee/update', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ const handleUpdate = async (values) => {
     }
 
     // Step 2: Get Razorpay key
-    const keyResponse = await fetch('http://localhost:8000/v1/api/razor/getkey', {
+    const keyResponse = await fetch('/v1/api/razor/getkey', {
       method: 'POST',
       headers: {
         authorization: `${token}`,
@@ -139,7 +139,7 @@ const handleUpdate = async (values) => {
     const { key } = await keyResponse.json();
 
     // Step 3: Create Razorpay order
-    const orderResponse = await fetch('http://localhost:8000/v1/api/razor/payment/checkout', {
+    const orderResponse = await fetch('/v1/api/razor/payment/checkout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ const handleUpdate = async (values) => {
       description: 'Fee Payments',
       image: 'https://upload.wikimedia.org/wikipedia/en/4/4c/Cvrh.ibp.jpg',
       order_id: order.id,
-      callback_url: `http://localhost:8000/v1/api/razor/payment/paymentverification`,
+      callback_url: `/v1/api/razor/payment/paymentverification`,
       prefill: {
         name: values.fullName,
         email: values.Email,
@@ -180,7 +180,7 @@ const handleUpdate = async (values) => {
     // Add handler function to verify payment after success
     handler: async function (response) {
       try {
-        const verificationResponse = await fetch(`http://localhost:8000/v1/api/razor/payment/paymentverification`, {
+        const verificationResponse = await fetch(`/v1/api/razor/payment/paymentverification`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
