@@ -216,9 +216,9 @@ const handleUpdate = async (values) => {
         } = result;
   
         // Construct redirect URL with transaction data as query parameters
-        const redirectUrl = `/success?transactionId=${transactionId}s&razorpayOrderId=${razorpayOrderId}&feeType=${feeType}&feeYear=${feeYear}&feeSem=${feeSem}&roll=${roll}&name=${encodeURIComponent(name)}&phone=${phone}&amount=${amount}&date=${date}&time=${time}`;
+        //const redirectUrl = `/success?transactionId=${transactionId}s&razorpayOrderId=${razorpayOrderId}&feeType=${feeType}&feeYear=${feeYear}&feeSem=${feeSem}&roll=${roll}&name=${encodeURIComponent(name)}&phone=${phone}&amount=${amount}&date=${date}&time=${time}`;
         localStorage.removeItem('token')
-        window.location.href = redirectUrl; // Redirect to success page with transaction details
+        navigate(`/success?transactionId=${transactionId}&razorpayOrderId=${razorpayOrderId}&feeType=${feeType}&feeYear=${feeYear}&feeSem=${feeSem}&roll=${roll}&name=${encodeURIComponent(name)}&phone=${phone}&amount=${amount}&date=${date}&time=${time}`);
       } catch (verificationError) {
         console.error('Error during payment verification:', verificationError);
         // Handle verification error (e.g., show error message)
