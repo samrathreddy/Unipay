@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const validate = require('../models/rollDobModel');
 const logEntry = require('../Utils/logUtil');
 const formatDate = require('../Utils/formatDate');
-const validateInput = require('../Middlewares/validateInputMiddleware');
+const validateInput = require('../middlewares/validateInputMiddleware');
 
 const router = express.Router();
 const SECRET_KEY = process.env.SECRET_KEY;

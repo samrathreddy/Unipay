@@ -2,14 +2,19 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
-const limiter = require('./Middlewares/rateLimitMiddleware');
+const limiter = require('./middlewares/rateLimitMiddleware');
 const rollRoutes = require('./routes/rollRoute');
-const dobRoutes = require('./Routes/dobRoute');
-const feeRoutes = require('./Routes/feeRoute');
-const paymentRoutes = require('./Routes/paymentRoute');
+const dobRoutes = require('./routes/dobRoute');
+const feeRoutes = require('./routes/feeRoute');
+const paymentRoutes = require('./routes/paymentRoute');
+
+const path = require('path');
+
 
 const app = express();
 const PORT = process.env.PORT || 8000;
+
+app.use(express.static(path.resolve(__dirname,'build')))
 
 // CORS configuration
 const corsOptions = {
@@ -37,6 +42,10 @@ app.use("/v1/api/razor/getkey", (req, res) =>
   res.status(200).json({ key: process.env.RAZORPAY_API_KEY })
 );
 
+
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+

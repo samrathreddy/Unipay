@@ -1,6 +1,7 @@
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const Payment = require('../models/paymentModel');
+const xlsx = require('xlsx');
 
 const client = new Client({
     intents: [
@@ -13,9 +14,6 @@ const client = new Client({
     partials: ['CHANNEL'],
 });
 
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
-});
 
 const FEE_NOTIFY_CHANNEL_ID = process.env.FEE_NOTIFY_CHANNEL_ID;
 const VERIFIED_CHANNEL_ID = process.env.VERIFIED_CHANNEL_ID;
@@ -39,6 +37,47 @@ function savePaymentDetails(paymentDetails) {
 
 // Load payment details on startup
 const paymentDetailsMap = loadPaymentDetails();
+
+async function updateStatusInExcel(filePath, transactionId, newStatus) {
+    let workbook;
+    if (fs.existsSync(filePath)) {
+        workbook = xlsx.readFile(filePath);
+    } else {
+        console.error('Excel file does not exist.');
+        return;
+    }
+
+    const sheetName = 'Payments';
+    const worksheet = workbook.Sheets[sheetName];
+
+    // Get the range of existing data
+    const range = worksheet['!ref'] ? xlsx.utils.decode_range(worksheet['!ref']) : { s: { r: 0, c: 0 }, e: { r: 0, c: 0 } };
+
+    let transactionRowIndex = -1;
+
+    // Loop through the rows to find the transaction ID
+    for (let rowIndex = range.s.r; rowIndex <= range.e.r; rowIndex++) {
+        const cellAddress = xlsx.utils.encode_cell({ c: 2, r: rowIndex }); // Assuming transactionId is in the third column (index 2)
+        const cellValue = worksheet[cellAddress]?.v; // Get the value of the cell
+
+        if (cellValue === transactionId) {
+            transactionRowIndex = rowIndex;
+            break; // Exit the loop if found
+        }
+    }
+
+    // If transaction is found, update the Status field
+    if (transactionRowIndex !== -1) {
+        const statusCellAddress = xlsx.utils.encode_cell({ c: 16, r: transactionRowIndex }); // Assuming Status is in the sixteenth column (index 15)
+        worksheet[statusCellAddress] = { v: newStatus, t: 's' }; // Update the status cell
+        console.log(`Status for transaction ${transactionId} updated to "${newStatus}".`);
+    } else {
+        console.log(`Transaction ${transactionId} not found.`);
+    }
+
+    // Save the updated workbook
+    xlsx.writeFile(workbook, filePath);
+}
 
 function createPaymentEmbed(paymentDetails, status) {
     const embed = new EmbedBuilder()
@@ -114,7 +153,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
         let embed;
         let paymentRecord = await Payment.findOne({ Roll: paymentDetails.roll });
-
+        const filePath = 'main.xlsx';
         if (paymentRecord) {
             const transaction = paymentRecord.Payments.find(p => p.transactionId === paymentDetails.transactionId);
             if (reaction.emoji.name === '✅') {
@@ -124,6 +163,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
                 if (transaction) {
                     transaction.manual = 'Verified';
+                    await updateStatusInExcel(filePath, paymentDetails.transactionId, 'Verified');
                 }
 
                 delete paymentDetailsMap[fetchedMessage.id];
@@ -135,6 +175,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 
                 if (transaction) {
                     transaction.manual = 'Rejected';
+                    await updateStatusInExcel(filePath, paymentDetails.transactionId, 'Rejected');
                 }
                 delete paymentDetailsMap[fetchedMessage.id];
                 savePaymentDetails(paymentDetailsMap);
@@ -193,16 +234,16 @@ client.on('messageCreate', async (message) => {
 
         // Handle getpayments command
         if (message.content.startsWith('!getpayments')) {
-            await message.delete();
             const args = message.content.split(' ');
             if (args.length !== 3) {
+                await message.delete();
                 return message.reply('Usage: !getpayments <Roll> <DOB(DD-MM-YYYY)>');
             }
 
             const roll = args[1];
             const dob = args[2];
             const dobPattern = /^\d{2}-\d{2}-\d{4}$/; // Date format validation
-
+            await message.delete();
             if (!dobPattern.test(dob)) {
                 return message.reply('Invalid date format. Please use DD-MM-YYYY.');
             }

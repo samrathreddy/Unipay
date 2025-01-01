@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const Payment = require('../models/paymentModel');
 const FeeDetail = require('../models/feeDetailModel');
 const jwt = require('jsonwebtoken');
-const { feeAmount, isFeeEnabled, isFeePaid } = require('../utils/feeUtil');
+const { feeAmount, isFeeEnabled, isFeePaid } = require('../Utils/feeUtil');
 const students = require('../models/rollDobModel');
 const sendSuccessEmail = require('./mailer');
 const { sendPaymentForVerification } = require('./discordBot');
@@ -80,9 +80,26 @@ const paymentVerification = async (req, res) => {
       const currentDate = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
       const currentTime = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' });
       const paymentCollection = mongoose.connection.collection('payments'); // Use the correct collection name
-
-    try {
-        // Check if the student already has a payment record
+      try{
+        const transactionData = {
+          transactionId: transactionId,
+          razorpayOrderId: razorpay_order_id,
+          feeType: feeType,
+          feeYear: feeYear,
+          feeSem: feeSem,
+          roll: Roll,
+          name: student.Name,
+          phone: payment.contact,
+          amount: payment.amount / 100,
+          date: currentDate,
+          time: currentTime
+      };
+        res.status(200).json(transactionData);
+      }catch (error) {
+        console.error("Error in payment success response", error);
+        res.status(500).json({ success: false, message: "Error in payment success response" });
+      }
+      try {
         console.log(Roll);
         let paymentRecord = await paymentCollection.findOne({ Roll });
 

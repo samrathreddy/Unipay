@@ -1,7 +1,7 @@
 // paymentRoute.js
 const express = require('express');
 const { checkout, paymentVerification } = require('../controllers/paymentcontroller.js');
-const authenticateJWT = require('../Middlewares/authMiddleware.js');
+const authenticateJWT = require('../middlewares/authMiddleware.js');
 
 
 const router = express.Router();

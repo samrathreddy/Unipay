@@ -1,7 +1,7 @@
 const express = require('express');
 const validate = require('../models/rollDobModel');
 const logEntry = require('../Utils/logUtil');
-const validateInput = require('../Middlewares/validateInputMiddleware');
+const validateInput = require('../middlewares/validateInputMiddleware');
 
 const router = express.Router();
 

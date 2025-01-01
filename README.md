@@ -4,6 +4,8 @@
 
 A comprehensive and user-friendly fee payment platform designed specifically for university students. Built using the MERN stack (MongoDB, Express, React, Node.js), this application streamlines the fee payment process and provides fee insights via Discord and payment integration via Razorpay.
 
+#### Project Proof of Concept : [Click here](https://www.loom.com/share/b5639004dbab48be9184a8f39d17499f?t=21)
+
 ## Getting Started
 
 ### Prerequisites
@@ -111,4 +113,3 @@ This will start the server on http://localhost:8000 and restart it automatically
 ### Real-time Notifications
 
 - **Discord** - For instant notifications, updates and admin operations
-  .

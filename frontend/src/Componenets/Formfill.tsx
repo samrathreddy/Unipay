@@ -155,6 +155,7 @@ const handleUpdate = async (values) => {
     const { order } = await orderResponse.json();
 
     // Step 4: Configure and open Razorpay payment modal
+    // Step 4: Configure and open Razorpay payment modal
     const options = {
       key,
       amount: order.amount,
@@ -179,7 +180,7 @@ const handleUpdate = async (values) => {
     // Add handler function to verify payment after success
     handler: async function (response) {
       try {
-        const verificationResponse = await fetch('http://localhost:8000/v1/api/razor/payment/paymentverification', {
+        const verificationResponse = await fetch(`http://localhost:8000/v1/api/razor/payment/paymentverification`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -195,10 +196,29 @@ const handleUpdate = async (values) => {
         if (!verificationResponse.ok) {
           throw new Error(`Payment verification failed: ${await verificationResponse.text()}`);
         }
-
+  
         const result = await verificationResponse.json();
         console.log('Payment verification successful:', result);
-        // Handle successful verification (e.g., show success message or navigate)
+  
+        // Redirect on successful verification
+        const {
+          transactionId,
+          razorpayOrderId,
+          feeType,
+          feeYear,
+          feeSem,
+          roll,
+          name,
+          phone,
+          amount,
+          date,
+          time
+        } = result;
+  
+        // Construct redirect URL with transaction data as query parameters
+        const redirectUrl = `/success?transactionId=${transactionId}s&razorpayOrderId=${razorpayOrderId}&feeType=${feeType}&feeYear=${feeYear}&feeSem=${feeSem}&roll=${roll}&name=${encodeURIComponent(name)}&phone=${phone}&amount=${amount}&date=${date}&time=${time}`;
+        localStorage.removeItem('token')
+        window.location.href = redirectUrl; // Redirect to success page with transaction details
       } catch (verificationError) {
         console.error('Error during payment verification:', verificationError);
         // Handle verification error (e.g., show error message)

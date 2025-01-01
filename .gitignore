@@ -4,6 +4,8 @@
 /frontend/node_modules/
 /server/node_modules/
 /.pnp
+/server/main.xlsx
+/server/logs/
 .pnp.js
 .env
 # testing
@@ -24,3 +26,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+server/main.xlsx
+server/logs/
+server/paymentDetails.json

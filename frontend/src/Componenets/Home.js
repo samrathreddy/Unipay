@@ -8,19 +8,26 @@ function Home() {
     const container = document.querySelector('.container');
     container.scrollIntoView({ behavior: 'smooth' });
   };
+  const scrollToVideo = () => {
+    const videoContainer = document.querySelector('.bottom-container');
+    if (videoContainer) {
+      videoContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <div>
     <div className="top-container">
       <header>
-        <img src="trans.png" alt="" />
+        <img src="" alt="" />
         <div className="center-nav">
-          <a onClick={scrollToSteps} href="#">Steps</a>
-          <a href="#">Why us?</a>
-          <a href="#">Sales</a>
+          <a onClick={scrollToSteps}>Steps</a>
+          <a onClick={scrollToVideo}>How to use?</a>
+          <a href="javascript:void(0);">Sales</a>
           <a href="#">Support</a>
         </div>
         <a href="#">Pay Now</a>
+        
         <img className="hamburger" src="img/hamburger.svg" alt="Hamburger Icon" />
       </header>
       <div className="center-box">
